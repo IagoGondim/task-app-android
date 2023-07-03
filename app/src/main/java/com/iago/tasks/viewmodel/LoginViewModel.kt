@@ -7,14 +7,17 @@ import androidx.lifecycle.MutableLiveData
 import com.iago.tasks.service.constants.TaskConstants
 import com.iago.tasks.service.listener.APIListener
 import com.iago.tasks.service.model.PersonModel
+import com.iago.tasks.service.model.PriorityModel
 import com.iago.tasks.service.model.ValidationModel
 import com.iago.tasks.service.repository.PersonRepository
+import com.iago.tasks.service.repository.PriorityRepository
 import com.iago.tasks.service.repository.SecurityPreferences
 import com.iago.tasks.service.repository.remote.RetrofitClient
 
 class LoginViewModel(application: Application) : AndroidViewModel(application) {
   
   private val personRepository = PersonRepository(application.applicationContext)
+  private val priorityRepository = PriorityRepository(application.applicationContext)
   private val securityPreferences = SecurityPreferences(application.applicationContext)
   
   
@@ -55,11 +58,23 @@ class LoginViewModel(application: Application) : AndroidViewModel(application) {
   fun verifyLoggedUser() {
     val token = securityPreferences.get(TaskConstants.SHARED.TOKEN_KEY)
     val person = securityPreferences.get(TaskConstants.SHARED.PERSON_KEY)
-  
+    
     RetrofitClient.addHeaders(token, person)
-  
-  
-    _loggedUser.value = (token != "" && person != "")
+    
+    val logged = (token != "" && person != "")
+    _loggedUser.value = logged
+    
+    if (!logged) {
+      priorityRepository.list(object : APIListener<List<PriorityModel>> {
+        override fun onSuccess(result: List<PriorityModel>) {
+          priorityRepository.save(result)
+        }
+        
+        override fun onFailure(message: String) {
+          val s = ""
+        }
+      })
+    }
   }
   
 }
