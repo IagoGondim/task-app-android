@@ -3,6 +3,7 @@ package com.iago.tasks.view
 import android.app.DatePickerDialog
 import android.os.Bundle
 import android.view.View
+import android.widget.ArrayAdapter
 import android.widget.DatePicker
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
@@ -30,6 +31,12 @@ class TaskFormActivity : AppCompatActivity(), View.OnClickListener,
     binding.buttonSave.setOnClickListener(this)
     binding.buttonDate.setOnClickListener(this)
     
+    viewModel.loadPriorities()
+    
+
+    
+    observe()
+    
     // Layout
     setContentView(binding.root)
   }
@@ -47,6 +54,17 @@ class TaskFormActivity : AppCompatActivity(), View.OnClickListener,
     binding.buttonDate.text = dueDate
     
     
+  }
+  
+  private fun observe(){
+    viewModel.priorityList.observe(this){
+      val list = mutableListOf<String>()
+      for(p in it){
+        list.add(p.description)
+      }
+      val adapter = ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, list)
+      binding.spinnerPriority.adapter = adapter
+    }
   }
   
   private fun handleDate() {

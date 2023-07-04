@@ -19,7 +19,6 @@ class PriorityRepository(val context: Context) {
   private val remote = RetrofitClient.getService(PriorityService::class.java)
   private val database = TaskDatabase.getDatabase(context).priorityDao()
   
-  
   fun list(listener: APIListener<List<PriorityModel>>) {
     val call = remote.list()
     call.enqueue(object : Callback<List<PriorityModel>> {
@@ -38,6 +37,10 @@ class PriorityRepository(val context: Context) {
         listener.onFailure(context.getString(R.string.ERROR_UNEXPECTED))
       }
     })
+  }
+  
+  fun list(): List<PriorityModel>{
+    return database.list()
   }
   
   fun save(list: List<PriorityModel>) {
