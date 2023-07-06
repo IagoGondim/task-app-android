@@ -20,10 +20,8 @@ class LoginViewModel(application: Application) : AndroidViewModel(application) {
   private val priorityRepository = PriorityRepository(application.applicationContext)
   private val securityPreferences = SecurityPreferences(application.applicationContext)
   
-  
   private val _login = MutableLiveData<ValidationModel>()
   val login: LiveData<ValidationModel> = _login
-  
   
   private val _loggedUser = MutableLiveData<Boolean>()
   val loggedUser: LiveData<Boolean> = _loggedUser
