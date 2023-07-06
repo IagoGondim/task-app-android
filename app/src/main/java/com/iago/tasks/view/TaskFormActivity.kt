@@ -9,6 +9,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
 import com.iago.tasks.R
 import com.iago.tasks.databinding.ActivityTaskFormBinding
+import com.iago.tasks.service.model.PriorityModel
+import com.iago.tasks.service.model.TaskModel
 import com.iago.tasks.viewmodel.TaskFormViewModel
 import java.text.SimpleDateFormat
 import java.util.Calendar
@@ -19,6 +21,7 @@ class TaskFormActivity : AppCompatActivity(), View.OnClickListener,
   private lateinit var viewModel: TaskFormViewModel
   private lateinit var binding: ActivityTaskFormBinding
   private val dateFormat = SimpleDateFormat("dd/MM/yyyy")
+  private var listPriority: List<PriorityModel> = mutableListOf()
   
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
@@ -33,8 +36,6 @@ class TaskFormActivity : AppCompatActivity(), View.OnClickListener,
     
     viewModel.loadPriorities()
     
-
-    
     observe()
     
     // Layout
@@ -42,8 +43,10 @@ class TaskFormActivity : AppCompatActivity(), View.OnClickListener,
   }
   
   override fun onClick(v: View) {
-    if (v.id == R.id.button_date)
+    if (v.id == R.id.button_date) {
       handleDate()
+    } else if (v.id == R.id.button_save)
+      handleSave()
   }
   
   override fun onDateSet(view: DatePicker, year: Int, month: Int, dayOfMonth: Int) {
@@ -53,13 +56,13 @@ class TaskFormActivity : AppCompatActivity(), View.OnClickListener,
     val dueDate = dateFormat.format(calendar.time)
     binding.buttonDate.text = dueDate
     
-    
   }
   
-  private fun observe(){
-    viewModel.priorityList.observe(this){
+  private fun observe() {
+    viewModel.priorityList.observe(this) {
+      listPriority = it
       val list = mutableListOf<String>()
-      for(p in it){
+      for (p in it) {
         list.add(p.description)
       }
       val adapter = ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, list)
@@ -75,5 +78,17 @@ class TaskFormActivity : AppCompatActivity(), View.OnClickListener,
     DatePickerDialog(this, this, year, month, day).show()
   }
   
-  
+  private fun handleSave() {
+    val task = TaskModel().apply {
+      this.id = 0
+      this.description = binding.editDescription.text.toString()
+      this.dueDate = binding.buttonDate.text.toString()
+      this.complete = binding.checkComplete.isChecked
+      
+      val index = binding.spinnerPriority.selectedItemPosition
+      this.priorityId = listPriority[index].id
+      
+    }
+    viewModel.save(task)
+  }
 }
