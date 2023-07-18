@@ -2,10 +2,10 @@ package com.iago.tasks.service.repository.remote
 
 import com.iago.tasks.service.model.TaskModel
 import retrofit2.Call
-import retrofit2.http.DELETE
 import retrofit2.http.Field
 import retrofit2.http.FormUrlEncoded
 import retrofit2.http.GET
+import retrofit2.http.HTTP
 import retrofit2.http.POST
 import retrofit2.http.PUT
 import retrofit2.http.Path
@@ -44,16 +44,19 @@ interface TaskService {
   ): Call<Boolean>
   
   @PUT("Task/Complete")
+  @FormUrlEncoded
   fun complete(
     @Field("Id") Id: Int,
-    ): Call<Boolean>
+  ): Call<Boolean>
   
   @PUT("Task/Complete")
+  @FormUrlEncoded
   fun undo(
     @Field("Id") Id: Int,
   ): Call<Boolean>
   
-  @DELETE("Task")
+  @HTTP(method = "DELETE", path = "Task", hasBody = true)
+  @FormUrlEncoded
   fun delete(
     @Field("Id") Id: Int,
   ): Call<Boolean>
